@@ -21,11 +21,13 @@ defmodule Statx.Storage do
   end
 
   ## Private
+  @doc "Store a key/data pair"
   def handle_cast({:store, data}, ets_name) do
-    :ets.insert(ets_name, data)
+    :ok = :ets.insert(ets_name, data)
     { :noreply, ets_name }
   end
 
+  @doc "Get a key/data pair"
   def handle_call({:get, key}, _from, ets_name) do
     data = :ets.lookup(ets_name, key)
     {:reply, data, ets_name}

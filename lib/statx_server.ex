@@ -1,3 +1,37 @@
+defmodule Statx.Storage do
+  use GenServer
+
+  ## Public Api
+  def start_link(ets_name) do
+    GenServer.start_link(__MODULE__, ets_name, name: __MODULE__)
+  end
+
+  def init(ets_name) do
+    :ets.new(ets_name, [:named_table, :set])
+    {:ok, ets_name}
+  end
+
+  def store(data) do
+    GenServer.cast(__MODULE__, {:store, data})
+    {:ok, data}
+  end
+
+  def get(key) do
+    GenServer.call(__MODULE__, {:get, key})
+  end
+
+  ## Private
+  def handle_cast({:store, data}, ets_name) do
+    :ets.insert(ets_name, data)
+    { :noreply, ets_name }
+  end
+
+  def handle_call({:get, key}, _from, ets_name) do
+    data = :ets.lookup(ets_name, key)
+    {:reply, data, ets_name}
+  end
+end
+
 defmodule Statx.Server do
   use GenServer
 
@@ -13,15 +47,13 @@ defmodule Statx.Server do
   ## Private API
   @doc "Server starting"
   def init(port) do
-    :ets.new(:packets, [:named_table, :set])
     {:ok, socket } = :gen_udp.open(port)
     {:ok, socket }
   end
 
   @doc "Handle messages from the UDP socket"
-  def handle_info({:udp, socket, ip, port, data}, socket) do
-    :ok = :gen_udp.send(socket, ip, port, data)
-    true = :ets.insert(:packets, {'BOOM!', 'BANG!'})
+  def handle_info({:udp, _socket, _ip, _port, _data}, socket) do
+    :ok = Statx.Storage.store({'BOOM!', 'BANG!'})
     {:noreply, socket}
   end
 

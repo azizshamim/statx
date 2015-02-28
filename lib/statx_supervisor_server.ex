@@ -8,7 +8,8 @@ defmodule Statx.ServerSupervisor do
   def init([]) do
     children = [
       # Define workers and child supervisors to be supervised
-      worker(Statx.Server, [1516])
+      worker(Statx.Server, [1516]),
+      worker(Statx.Storage, [:packets])
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html

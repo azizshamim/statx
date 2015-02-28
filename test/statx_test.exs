@@ -11,7 +11,7 @@ defmodule StatxTest do
         after 10 ->
           true
         end
-      res = :nil
+      res = Statx.Storage.get('BOOM!')
       assert([{'BOOM!', 'BANG!'}] == res)
       # Clean up
       :gen_udp.close(client_socket)

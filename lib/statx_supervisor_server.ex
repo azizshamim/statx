@@ -1,4 +1,4 @@
-defmodule Statx.ServerSupervisor do
+defmodule Statx.Supervisor do
   use Supervisor
 
   def start_link do

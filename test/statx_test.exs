@@ -16,7 +16,7 @@ defmodule StatxTest do
 
   test "should start the StatX server", %{socket: socket} do
       # Launch missile!
-      :ok = :gen_udp.send(socket, {127,0,0,1}, 1514, "BOOM!")
+      :ok = :gen_udp.send(socket, {127,0,0,1}, 1516, "BOOM!")
       res = Statx.Storage.get('BOOM!')
       assert([{'BOOM!', 'BANG!'}] == res)
       # Clean up

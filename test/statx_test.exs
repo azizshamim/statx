@@ -1,19 +1,25 @@
 defmodule StatxTest do
   use ExUnit.Case
 
-  test "should start the StatX server" do
-      {:ok, client_socket} = :gen_udp.open(1515)
-      # Launch missile!
-      :ok = :gen_udp.send(client_socket, {127,0,0,1}, 1514, "BOOM!")
+  setup do
+    Logger.remove_backend(:console)
+    :application.stop(:statx)
+    :ok = :application.start(:statx)
+    Logger.add_backend(:console, flush: true)
+    :ok
+  end
 
-      # FAKE THAT OUT
-      fakeout = receive do
-        after 10 ->
-          true
-        end
+  setup do
+    {:ok, socket} = :gen_udp.open(1515)
+    {:ok, socket: socket }
+  end
+
+  test "should start the StatX server", %{socket: socket} do
+      # Launch missile!
+      :ok = :gen_udp.send(socket, {127,0,0,1}, 1514, "BOOM!")
       res = Statx.Storage.get('BOOM!')
       assert([{'BOOM!', 'BANG!'}] == res)
       # Clean up
-      :gen_udp.close(client_socket)
+      :gen_udp.close(socket)
   end
 end

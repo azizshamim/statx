@@ -54,8 +54,8 @@ defmodule Statx.Server do
   end
 
   @doc "Handle messages from the UDP socket"
-  def handle_info({:udp, _socket, _ip, _port, _data}, socket) do
-    :ok = Statx.Storage.store({'BOOM!', 'BANG!'})
+  def handle_info({:udp, _socket, _ip, _port, data}, socket) do
+    :ok = Statx.Storage.store(data)
     {:noreply, socket}
   end
 

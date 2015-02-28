@@ -1,11 +1,11 @@
-defmodule Statx do
-  use Application
+defmodule Statx.ServerSupervisor do
+  use Supervisor
 
-  # See http://elixir-lang.org/docs/stable/elixir/Application.html
-  # for more information on OTP Applications
-  def start(_type, _args) do
-    import Supervisor.Spec, warn: true
+  def start_link do
+    Supervisor.start_link(__MODULE__, [])
+  end
 
+  def init([]) do
     children = [
       # Define workers and child supervisors to be supervised
       worker(Statx.Server, [1516])
@@ -13,7 +13,7 @@ defmodule Statx do
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
     # for other strategies and supported options
-    opts = [strategy: :one_for_one, name: Statx.Supervisor]
-    Supervisor.start_link(children, opts)
+    opts = [strategy: :one_for_one]
+    supervise(children, opts)
   end
 end

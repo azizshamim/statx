@@ -16,9 +16,14 @@ defmodule StatxTest do
 
   test "should start the StatX server", %{socket: socket} do
       # Launch missile!
-      :ok = :gen_udp.send(socket, {127,0,0,1}, 1516, "BOOM!")
+      :ok = :gen_udp.send(socket, {127,0,0,1}, 1516, 'BANG!')
+      receive do
+      after
+        100 -> :timeout
+      end
+      #res = Statx.Storage.count
       res = Statx.Storage.get('BOOM!')
-      assert([{'BOOM!', 'BANG!'}] == res)
+      assert('BANG!' == res)
       # Clean up
       :gen_udp.close(socket)
   end

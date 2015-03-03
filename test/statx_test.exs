@@ -1,16 +1,8 @@
 defmodule StatxTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
 
   def send_message(socket, message) do
     :ok = :gen_udp.send(socket, {127,0,0,1}, 1516, message)
-  end
-
-  setup do
-    Logger.remove_backend(:console)
-    :application.stop(:statx)
-    :ok = :application.start(:statx)
-    Logger.add_backend(:console, flush: true)
-    :ok
   end
 
   def wait_for(ms) do
@@ -21,19 +13,27 @@ defmodule StatxTest do
   end
 
   setup do
+    Logger.remove_backend(:console)
+    :application.stop(:statx)
+    :ok = :application.start(:statx)
+    Logger.add_backend(:console, flush: true)
+    :ok
+  end
+
+  setup do
     {:ok, socket} = :gen_udp.open(1515)
     {:ok, socket: socket }
   end
 
   test :statsd_guage , %{socket: socket} do
     # <metric name>:<value>|g
-    assert :ok == socket |> send_message("test.something:00|g")
+    assert :ok == socket |> send_message("test.something:0|g")
     wait_for(100)
-    res = Statx.Storage.get('test.something')
+    res = Statx.Storage.get("test.something")
     assert res == %{
-      key: 'test.something',
-      message: "test.something:00|g",
-      metric: "00",
+      key: "test.something",
+      message: "test.something:0|g",
+      metric: 0,
       type: "g"
     }
   end

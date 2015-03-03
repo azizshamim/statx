@@ -8,8 +8,8 @@ defmodule Statx.Storage do
   end
 
   def init(ets_name) do
-    :ets.new(:packets, [:named_table, :set])
-    {:ok, :packets}
+    :ets.new(ets_name, [:named_table, :set])
+    {:ok, ets_name}
   end
 
   def store(data) do
@@ -27,25 +27,25 @@ defmodule Statx.Storage do
 
   ## Private
   @doc "Store a key/data pair"
-  def handle_cast({:store, data}, _ets_name) do
-    case :ets.insert(:packets, {data.key, data} ) do
-      true  -> { :noreply, :packets}
-      error -> { :reply,   error, :packets}
+  def handle_cast({:store, data}, ets_name) do
+    case :ets.insert(ets_name, {data.key, data} ) do
+      true  -> { :noreply, ets_name}
+      error -> { :reply,   error, ets_name}
     end
   end
 
   @doc "Count the keys"
-  def handle_call({:count}, _from, _ets_name) do
-    case :ets.match(:packets, :"$1") do
-      [data] -> {:reply, data, :packets}
+  def handle_call({:count}, _from, ets_name) do
+    case :ets.match(ets_name, :"$1") do
+      [data] -> {:reply, data, ets_name}
     end
   end
 
   @doc "Get a key/data pair"
   def handle_call({:get, key}, _from, ets_name) do
     case lookup(ets_name, key) do
-      {:reply, data, _ets_name} -> {:reply, data, :packets}
-      :error -> {:reply, [], :packets}
+      {:reply, data, ^ets_name} -> {:reply, data, ets_name}
+      :error -> {:reply, [], ets_name}
     end
   end
 

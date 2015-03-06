@@ -23,10 +23,10 @@ defmodule Statx.StatsDTest do
     }
   end
   test :counter_with_rate do
-    res = Statx.StatsD.process_message(%{message: "test.counter:100|c@0.1"})
+    res = Statx.StatsD.process_message(%{message: "test.counter:100|c|@0.1"})
     assert res == %{
       key: "test.counter",
-      message: "test.counter:100|c@0.1",
+      message: "test.counter:100|c|@0.1",
       metric: 100,
       type: "c",
       sample: 0.1,

@@ -29,8 +29,17 @@ defmodule Statx.StatsD do
   end
 
   defp extract_type(message) do
-    [ type | _tail ] =  message[:message] |> String.split("|") |> Enum.reverse
-    Dict.put(message, :type , type)
+    case message |> split_pipe do
+      [ _metric, type ]  -> Dict.put(message, :type , type)
+      [ _metric, type, sample ] ->
+        message
+          |> Dict.put(:type, type)
+          |> Dict.put(:sample, sample |> String.lstrip(?@) |> String.to_float )
+    end
+  end
+
+  defp split_pipe(message) do
+    message[:message] |> String.split("|")
   end
 
   defp extract_metric(message) do

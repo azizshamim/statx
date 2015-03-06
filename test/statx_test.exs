@@ -30,11 +30,12 @@ defmodule StatxTest do
     assert :ok == socket |> send_message("test.something:0|g")
     wait_for(100)
     res = Statx.Storage.get("test.something")
-    assert res == %{
+    assert %{
       key: "test.something",
       message: "test.something:0|g",
       metric: 0,
-      type: "g"
-    }
+      type: "g",
+      timestamp: _,
+    } = res
   end
 end

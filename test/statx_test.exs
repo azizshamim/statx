@@ -27,15 +27,11 @@ defmodule StatxTest do
 
   test :statsd_guage , %{socket: socket} do
     # <metric name>:<value>|g
-    assert :ok == socket |> send_message("test.something:0|g")
+      1..100
+        |> Enum.map(fn(x) ->
+                      socket |> send_message("test.something:#{x}|g")
+                    end)
     wait_for(100)
-    res = Statx.Storage.get("test.something")
-    assert %{
-      key: "test.something",
-      message: "test.something:0|g",
-      metric: 0,
-      type: "g",
-      timestamp: _,
-    } = res
+    assert 100 == Statx.Storage.count
   end
 end

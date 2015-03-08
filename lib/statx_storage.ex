@@ -37,7 +37,7 @@ defmodule Statx.Storage do
   @doc "Count the keys"
   def handle_call({:count}, _from, ets_name) do
     case :ets.match(ets_name, :"$1") do
-      [data] -> {:reply, data, ets_name}
+      data -> {:reply, data |> List.flatten |> length, ets_name}
     end
   end
 

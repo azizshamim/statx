@@ -28,7 +28,7 @@ defmodule Statx.Storage do
   ## Private
   @doc "Store a key/data pair"
   def handle_cast({:store, data}, ets_name) do
-    case :ets.insert(ets_name, {data.key, data} ) do
+    case :ets.insert(ets_name, {data.timestamp, data} ) do
       true  -> { :noreply, ets_name}
       error -> { :reply,   error, ets_name}
     end

@@ -29,9 +29,9 @@ defmodule StatxTest do
     # <metric name>:<value>|g
       1..100
         |> Enum.map(fn(x) ->
-                      socket |> send_message("test.something:#{x}|g")
+                      socket |> send_message("test.key:#{x}|g")
                     end)
     wait_for(100)
-    assert 100 == Statx.Storage.count
+    assert 100 == Statx.Storage.count(:test_key)
   end
 end

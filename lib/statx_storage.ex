@@ -4,7 +4,7 @@ defmodule Statx.Storage do
 
   ## Public Api
   def start_link(ets_name) do
-    GenServer.start_link(__MODULE__, ets_name, name: __MODULE__)
+    GenServer.start_link(__MODULE__, ets_name, name: ets_name)
   end
 
   def init(ets_name) do
@@ -13,16 +13,21 @@ defmodule Statx.Storage do
   end
 
   def store(data) do
-    GenServer.cast(__MODULE__, {:store, data})
+    GenServer.cast(
+      data[:key]
+        |> String.replace(".","_", global: false)
+        |> String.to_atom,
+      {:store, data}
+    )
     {:ok, data}
   end
 
-  def get(key) do
-    GenServer.call(__MODULE__, {:get, key})
+  def get(ets_name, key) do
+    GenServer.call(ets_name, {:get, key})
   end
 
-  def count do
-    GenServer.call(__MODULE__, {:count})
+  def count(ets_name) do
+    GenServer.call(ets_name, {:count})
   end
 
   ## Private

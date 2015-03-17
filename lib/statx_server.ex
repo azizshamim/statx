@@ -19,8 +19,8 @@ defmodule Statx.Server do
 
   @doc "Handle messages from the UDP socket"
   def handle_info({:udp, _socket, _ip, _port, data}, socket) do
-    data |> List.to_string
-      |> (&(%{ :message => &1, :timestamp => :erlang.now })).()
+    data
+      |> List.to_string |> String.split(~r/(\||:)/)
       |> Statx.StatsD.process_message
       |> Statx.Storage.store
     {:noreply, socket}

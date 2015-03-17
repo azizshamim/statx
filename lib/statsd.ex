@@ -1,4 +1,10 @@
+defmodule Statx.Message do
+  defstruct type: nil, metric: nil, key: nil, sample: nil, timestamp: nil
+end
+
 defmodule Statx.StatsD do
+  require Logger
+
   defmacro __using__(_) do
     quote do
       alias Statx.StatsD
@@ -7,55 +13,30 @@ defmodule Statx.StatsD do
 
   # https://github.com/b/statsd_spec
   #   <metric name>:<value>|<type>
-  def process_message(message) do
+  def process_message(message) when is_bitstring(message) do
     message
-      |> extract_key
-      |> extract_metric
-      |> extract_type
+      |> String.split(~r/(\||:)/)
+      |> process_message
   end
 
-  def extract_key(message) do
-    [ key | _tail ] = message[:message] |> String.split(":")
-    Dict.put(message, :key, key)
+  def process_message(message) when is_list(message) do
+    _process_message(message)
   end
 
-  defp _extract_metric(message) do
-    metric = message[:message]
-      |> String.split("|")
-      |> List.first
-      |> String.split(":")
-      |> List.last
-    Dict.put(message, :metric, metric |> String.to_integer )
+  def _process_message(message) when length(message) == 4 do
+    [key, metric, type, sample] = message
+    %Statx.Message{timestamp: :erlang.now}
+      |> Map.put(:key, key)
+      |> Map.put(:metric, metric |> String.to_integer)
+      |> Map.put(:type, type)
+      |> Map.put(:sample, sample |> String.lstrip(?@) |> String.to_float)
   end
 
-  defp extract_type(message) do
-    case message |> split_pipe do
-      [ _metric, type ]  -> Dict.put(message, :type , type)
-      [ _metric, type, sample ] ->
-        message
-          |> Dict.put(:type, type)
-          |> Dict.put(:sample, sample |> String.lstrip(?@) |> String.to_float )
-    end
-  end
-
-  defp split_pipe(message) do
-    message[:message] |> String.split("|")
-  end
-
-  defp extract_metric(message) do
-    case message do
-      %{:type => "g"} ->
-        message |> _extract_metric
-      %{:type => "c"} ->
-        message |> _extract_metric
-      %{:type => "ms"} ->
-        message |> _extract_metric
-      %{:type => "h"} ->
-        message |> _extract_metric
-      %{:type => "m"} ->
-        message |> _extract_metric
-      _ -> 
-        message |> _extract_metric
-    end
+  def _process_message(message) when length(message) == 3 do
+    [key, metric, type] = message
+    %Statx.Message{timestamp: :erlang.now}
+      |> Map.put(:key, key)
+      |> Map.put(:metric, metric |> String.to_integer)
+      |> Map.put(:type, type)
   end
 end

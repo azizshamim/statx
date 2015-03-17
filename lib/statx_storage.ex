@@ -14,7 +14,7 @@ defmodule Statx.Storage do
 
   def store(data) do
     GenServer.cast(
-      data[:key]
+      data.key
         |> String.replace(".","_", global: false)
         |> String.to_atom,
       {:store, data}

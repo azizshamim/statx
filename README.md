@@ -1,15 +1,16 @@
-Statxsup
+# StatX - a statsd daemon
 ========
 
 * [x] UDP server
 * [x] storage server into ETS
 * [x] Supervisor for UDP and storage
-* [ ] Instrumentation
-* [ ] Logging
-* [ ] Performance testing
+* [x] Documentation
+* [x] Logging
 * [ ] Supervisor for storage (separate it out)
-* [ ] UDP pool
 * [ ] Storage server per metric - why not?
+* [ ] UDP pool
+* [ ] Instrumentation
+* [ ] Performance testing
 * [ ] Da Math - get some aggregation up in this hizzy
 * [ ] Multi-node
 * [ ] DETS storage

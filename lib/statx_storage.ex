@@ -2,6 +2,14 @@ defmodule Statx.Storage do
   use GenServer
   use Statx.StatsD
 
+  @doc ~S"""
+  Storage server for the StatX server. This stores the parsed UDP messages into ETS.
+
+  Examples:
+
+  iex> Statx.Storage.store(%{Statx.Message{})
+  {:ok, %{Statx.Message{}}
+  """
   ## Public Api
   def start_link(ets_name) do
     GenServer.start_link(__MODULE__, ets_name, name: ets_name)
@@ -12,6 +20,7 @@ defmodule Statx.Storage do
     {:ok, ets_name}
   end
 
+  @doc "Store data into the storage bucket"
   def store(data) do
     GenServer.cast(
       data.key
@@ -22,10 +31,12 @@ defmodule Statx.Storage do
     {:ok, data}
   end
 
+  @doc "Retrieve data from the storage bucket"
   def get(ets_name, key) do
     GenServer.call(ets_name, {:get, key})
   end
 
+  @doc "Count the data in the storage bucket"
   def count(ets_name) do
     GenServer.call(ets_name, {:count})
   end

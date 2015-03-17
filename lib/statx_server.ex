@@ -1,6 +1,9 @@
 defmodule Statx.Server do
   use GenServer
 
+  @doc ~S"""
+  UDP Listner for collecting statsd metrics
+  """
   ## Public API
   def start_link(port) do
     GenServer.start_link(__MODULE__, port, name: __MODULE__)
